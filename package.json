@@ -1,0 +1,16 @@
+{
+  "name": "crawl-unsplash-cl",
+  "version": "1.0.0",
+  "description": "Command Line Tool to scrape images from unsplash.",
+  "main": "crawl-unsplash.js",
+  "dependencies": {
+    "async": "^2.6.1",
+    "request": "^2.88.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Raphael Mayer",
+  "license": "MIT"
+}
