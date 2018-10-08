@@ -29,7 +29,7 @@ You may split the pages arg into 2 seperate args to define a start and end page.
 ## Examples
 `node crawl-unsplash -d wanderlust` fetches the first page and downloads all images and the JSON file.
 
-`node crawl-unsplash -l wanderlust 10` fetches pages 1 to 10 and logs JSON to console..
+`node crawl-unsplash -l wanderlust 10` fetches pages 1 to 10 and logs JSON to console.
 
 `node crawl-unsplash -j wanderlust 10 20` fetches pages 10 to 20 and downloads the JSON file.
 

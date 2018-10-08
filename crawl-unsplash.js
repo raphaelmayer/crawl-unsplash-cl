@@ -12,6 +12,7 @@ const config = {
 
 let images = [];
 
+
 function crawl(options, done) {
   	if (!options) {
   	  	return (done(new Error("Options are not defined.")))
@@ -52,39 +53,41 @@ function doPerPage(page, done) {
 	})
 }
 
+function ensureUniqueName(filename, i) {
+	fs.exists(`downloads/${filename}.json`, (exists) => {
+	  	if (!exists) {
+	  		console.log(`${filename} !exists`)
+			return filename;
+	  	} else {
+	  		console.log(`${filename} exists`)
+	  		const n = i ? i + 1 : 1;
+	  		ensureUniqueName(`${config.query} (${n})`, n);
+	  	}
+	});
+}
+
 function download(uri, filename, done) {
   	request.head(uri, (err, res, body) => {
-    	//console.log('content-type:', res.headers['content-type']);
-    	//console.log('content-length:', res.headers['content-length']);
-    
+    	console.log('content-type:', res.headers['content-type']);
+    	console.log('content-length:', res.headers['content-length'] b);
     	request(uri).pipe(fs.createWriteStream(filename)).on('close', done);
   	});
 };
 
 
-crawl(config, (err, images) => {
+crawl(config, (err, images) => {	// fires when last page got fetched
 	if (err) console.log(err);
 
 	if (images) {
 		console.log(`${images.length} images fetched.\n`);
 
+	// decide what actions to take
     if (config.param === "-l") {
     	console.log(images);
     }
 
     if (config.param === "-j" || config.param === "-d") {
-    	const makeUniqueName = (filename) => {
-    		fs.exists(`downloads/${filename}.json`, (exists) => {
-			  	if (!exists) {
-			  		console.log(`${filename} !exists`)
-    				fs.writeFileSync(`downloads/${filename}.json`, JSON.stringify(images, null, 2), "utf-8");
-			  	} else {
-			  		console.log(`${filename} exists`)
-			  		makeUniqueName(`${filename}_copy`);
-			  	}
-			});
-		}
-		makeUniqueName(config.query);
+		fs.writeFileSync(`downloads/${ensureUniqueName(config.query)}.json`, JSON.stringify(images, null, 2), "utf-8");
     }
 
     if (config.param === "-d") {
