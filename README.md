@@ -1,5 +1,5 @@
 # Crawl-Unsplash-CL
-A simple command line tool to scrape images from https://unsplash.com.
+A simple node.js command line tool to scrape images from https://unsplash.com.
 If you happen to find a bug or want to suggest a feature, feel free to contact me or *contribute*.
 
 ## Install
