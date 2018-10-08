@@ -3,18 +3,18 @@ A simple command line tool to scrape images from https://unsplash.com.
 If you happen to find a bug or want to suggest a feature, feel free to contact me or *contribute*.
 
 ## Install
-- download repository
+- download repository `https://github.com/raphaelmayer/crawl-unsplash-cl.git`
 - `cd yourpath/crawl-unsplash-cl`
 - `npm install`
 
 ## Usage
-from the directory of the repository run:
+From the directory of the repository run:
 `node crawl-unsplash <parameter> <query> <pages>`
 
 ### Parameter
-- **-j**: Download a JSON file containing data and links to images.
-- **-d**: Download a JSON file and all images.
-- **-l**: Print the data to console without downloading an files.
+- `-j`: Download a JSON file containing data and links to images.
+- `-d`: Download a JSON file and all images.
+- `-l`: Print the data to console without downloading an files.
 
 *Parameter is NOT optional.*
 ### Query
