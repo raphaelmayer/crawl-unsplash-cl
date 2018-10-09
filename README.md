@@ -3,9 +3,10 @@ A simple node.js command line tool to scrape images from https://unsplash.com.
 If you happen to find a bug or want to suggest a feature, feel free to contact me or *contribute*.
 
 ## Install
-- download repository `https://github.com/raphaelmayer/crawl-unsplash-cl.git`
-- `cd yourpath/crawl-unsplash-cl`
-- `npm install`
+- Download repository `https://github.com/raphaelmayer/crawl-unsplash-cl.git`
+- Navigate to directory or `cd yourpath/crawl-unsplash-cl`
+- In your shell of choice type `npm install` to install dependencies.
+- Done. Now go and get some images!
 
 ## Usage
 From the directory of the repository run:
@@ -16,9 +17,10 @@ From the directory of the repository run:
 - `-d`: Download a JSON file and all images.
 - `-l`: Print the data to console without downloading an files.
 
-*Parameter is NOT optional.*
+*Parameter is required.*
+
 ### Query
-*Query has to be a string and is NOT optional.* 
+*Query has to be a string and is required.* 
 
 ### Pages
 Define the amount of pages to be fetched. One page is 30 images.
@@ -36,6 +38,7 @@ You may split the pages arg into 2 seperate args to define a start and end page.
 
 Images and JSON lists are in order, although when fetching additional pages at a later point without clearing the downloads directory will most likely result in inconsistent results, since those pages update content so frequently and page 1 today might be page 10 tomorrow. 
 
+Concurrent downloads are currently not limited, although it might make sense to implement this in some form. 
 
 ## Contributions
 Contributions are welcome. Concisely state the problem and how you solved it. Do not fix multiple things in one PR. If you happen to find something else to fix while fixing any part of the code, please open another PR if you want to address this issue aswell. 
