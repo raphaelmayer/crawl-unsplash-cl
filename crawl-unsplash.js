@@ -53,16 +53,24 @@ function doPerPage(page, done) {
 	})
 }
 
-// keep track of total dl size and completed dls. (Maybe limit nr of concurrent dls in future version) 
-function downloadHandler(images) {
-	// const max = 10;
+// keeps track of total dl size and completed dls. (Maybe limit nr of concurrent dls in future version) 
+function downloadHandler(filename, images, i) {
 	let total = [];
 	let counter = 0;
-															// if starting from page 2 starts naming from 31++
-    images.map((img, i) => download(img.urls.raw, `downloads/${config.query}/${i+(config.startPage-1)*30}.jpg`, () => {
-    	counter++;
-    	console.log(`${counter}/${images.length} done.`);
-    }));
+	// const max = 10;
+
+	// recursively check for unique filename							
+	fs.mkdir(`downloads/${filename}`, (err) => {
+		if (err) {
+	  		const n = i ? i + 1 : 1;
+			downloadHandler(`${config.query} (${n})`, images, n);
+		} else {
+    		images.map((img, i) => download(img.urls.raw, `downloads/${filename}/${i}.jpg`, () => {
+    			counter++;
+    			console.log(`${counter}/${images.length} done.`);
+    		}));
+		}
+	})
 
 	function download(uri, filename, done) {
 	  	request.head(uri, (err, res, body) => {
@@ -77,20 +85,20 @@ function downloadHandler(images) {
 	}
 }
 
-// recursively check for unique filename
-function ensureUniqueName(filename, i) {
+function writeJsonToFile(filename, i) {
+	// recursively check for unique filename
 	fs.exists(`downloads/${filename}.json`, (exists) => {
-	  	if (!exists) {
-			return filename;
-	  	} else {
+	  	if (exists) {
 	  		const n = i ? i + 1 : 1;
-	  		ensureUniqueName(`${config.query} (${n})`, n);
+	  		writeJsonToFile(`${config.query} (${n})`, n);
+	  	} else {
+			fs.writeFileSync(`downloads/${filename}.json`, JSON.stringify(images, null, 2), "utf-8");
 	  	}
 	});
 }
 
 
-crawl(config, (err, images) => {	// fires when last page got fetched
+crawl(config, (err, images) => {	// callback fires when last page got fetched
 	if (err) console.log(err);
 
 	if (images) {
@@ -102,13 +110,11 @@ crawl(config, (err, images) => {	// fires when last page got fetched
     }
 
     if (config.param === "-j" || config.param === "-d") {
-		fs.writeFileSync(`downloads/${ensureUniqueName(config.query)}.json`, JSON.stringify(images, null, 2), "utf-8");
-    }
+		writeJsonToFile(config.query);
+	}
 
     if (config.param === "-d") {
-      	fs.mkdir(`downloads/${config.query}`, (err) => {
-        	downloadHandler(images);
-      	})
+        downloadHandler(config.query, images);
     }
 
   } else {
