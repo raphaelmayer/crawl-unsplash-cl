@@ -33,13 +33,14 @@ function crawl(options, done) {
 		pages.push(i);
 	}
 
-	async.each(pages, doPerPage, (err) => {
+	async.each(pages, doPerPage.bind(null, options.query), (err) => {
 		done(err, options, images);
 	});
 }
 
-function doPerPage(page, done) {
-	request(config.url + `${page}` , (err, res, body) => {
+function doPerPage(query, page, done) {
+	const url = `https://unsplash.com/napi/search/photos?query=${query}&per_page=30&page=${page}`;
+	request(url, (err, res, body) => {
 		if (err) done(err);
 
 		if (res && res.statusCode == 200) {
