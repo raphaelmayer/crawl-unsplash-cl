@@ -53,8 +53,8 @@ function doPerPage(page, done) {
 	})
 }
 
-// keeps track of total dl size and completed dls. (Maybe limit nr of concurrent dls in future version) 
 function downloadHandler(filename, images, i) {
+	// keeps track of total dl size and completed dls. (Maybe limit nr of concurrent dls in future version) 
 	let total = [];
 	let counter = 0;
 	// const max = 10;
@@ -104,20 +104,20 @@ crawl(config, (err, images) => {	// callback fires when last page got fetched
 	if (images) {
 		console.log(`${images.length} images fetched.\n`);
 
-	// decide what actions to take
-    if (config.param === "-l") {
-    	console.log(images);
-    }
+		// decide what actions to take
+    	if (config.param === "-l") {
+    		console.log(images);
+    	}
+	
+    	if (config.param === "-j" || config.param === "-d") {
+			writeJsonToFile(config.query);
+		}
+	
+    	if (config.param === "-d") {
+    	    downloadHandler(config.query, images);
+    	}
 
-    if (config.param === "-j" || config.param === "-d") {
-		writeJsonToFile(config.query);
-	}
-
-    if (config.param === "-d") {
-        downloadHandler(config.query, images);
-    }
-
-  } else {
+  	} else {
 		console.log("Nothing returned.");
 	}
 });
