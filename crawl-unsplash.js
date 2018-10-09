@@ -53,26 +53,41 @@ function doPerPage(page, done) {
 	})
 }
 
+// keep track of total dl size and completed dls. (Maybe limit nr of concurrent dls in future version) 
+function downloadHandler(images) {
+	// const max = 10;
+	let total = [];
+	let counter = 0;
+															// if starting from page 2 starts naming from 31++
+    images.map((img, i) => download(img.urls.raw, `downloads/${config.query}/${i+(config.startPage-1)*30}.jpg`, () => {
+    	counter++;
+    	console.log(`${counter}/${images.length} done.`);
+    }));
+
+	function download(uri, filename, done) {
+	  	request.head(uri, (err, res, body) => {
+	  		total.push(Number(res.headers['content-length']));
+	    	request(uri).pipe(fs.createWriteStream(filename)).on('close', done);
+	
+	    	// log out total dl size once all dls are initiated
+	    	if (total.length === images.length) {
+	    		console.log(`${Math.round(total.reduce((prev, curr) => prev + curr, 0) / 1000000)} MB total.\ndownloading now...\n`)
+	    	}
+	  	});
+	}
+}
+
+// recursively check for unique filename
 function ensureUniqueName(filename, i) {
 	fs.exists(`downloads/${filename}.json`, (exists) => {
 	  	if (!exists) {
-	  		console.log(`${filename} !exists`)
 			return filename;
 	  	} else {
-	  		console.log(`${filename} exists`)
 	  		const n = i ? i + 1 : 1;
 	  		ensureUniqueName(`${config.query} (${n})`, n);
 	  	}
 	});
 }
-
-function download(uri, filename, done) {
-  	request.head(uri, (err, res, body) => {
-    	console.log('content-type:', res.headers['content-type']);
-    	console.log('content-length:', res.headers['content-length'] b);
-    	request(uri).pipe(fs.createWriteStream(filename)).on('close', done);
-  	});
-};
 
 
 crawl(config, (err, images) => {	// fires when last page got fetched
@@ -91,13 +106,8 @@ crawl(config, (err, images) => {	// fires when last page got fetched
     }
 
     if (config.param === "-d") {
-      	console.log("downloading...")
       	fs.mkdir(`downloads/${config.query}`, (err) => {
-        	let counter = 0;
-        	images.map((img, i) => download(img.urls.raw, `downloads/${config.query}/${i+(config.startPage-1)*30}.jpg`, () => {
-          		counter++;
-          		console.log(`${counter}/${images.length} done.`)
-        	}));
+        	downloadHandler(images);
       	})
     }
 
