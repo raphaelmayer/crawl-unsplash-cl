@@ -34,7 +34,7 @@ function crawl(options, done) {
 	}
 
 	async.each(pages, doPerPage, (err) => {
-		done(err, images);
+		done(err, options, images);
 	});
 }
 
@@ -51,7 +51,6 @@ function doPerPage(page, done) {
 		} else {
 			done(new Error(`Could not request unsplash. (${res && res.statusCode})`));
 		}
-
 	})
 }
 
@@ -59,15 +58,14 @@ function downloadHandler(filename, images, i) {
 	// keeps track of total dl size and completed dls. (Maybe limit nr of concurrent dls in future version) 
 	let total = [];
 	let counter = 0;
-	// const max = 10;
 
-	// recursively check for unique filename							
-	fs.mkdir(`downloads/${filename}`, (err) => {
+	// recursively ensures unique filename
+	const suffix = i ? ` (${i})` : "";	// eg. (1)
+	fs.mkdir(`downloads/${filename}${suffix}`, (err) => {
 		if (err) {
-	  		const n = i ? i + 1 : 1;
-			downloadHandler(`${config.query} (${n})`, images, n);
+			downloadHandler(filename, images, i ? i + 1 : 1);
 		} else {
-    		images.map((img, i) => download(img.urls.raw, `downloads/${filename}/${i}.jpg`, () => {
+    		images.map((img, i) => download(img.urls.raw, `downloads/${filename}${suffix}/${i}.jpg`, () => {
     			counter++;
     			console.log(`${counter}/${images.length} done.`);
     		}));
@@ -88,35 +86,35 @@ function downloadHandler(filename, images, i) {
 }
 
 function writeJsonToFile(filename, i) {
-	// recursively check for unique filename
-	fs.exists(`downloads/${filename}.json`, (exists) => {
+	// recursively ensures unique filename
+	const suffix = i ? ` (${i})` : "";	// eg. (1)
+	fs.exists(`downloads/${filename}${suffix}.json`, (exists) => {
 	  	if (exists) {
-	  		const n = i ? i + 1 : 1;
-	  		writeJsonToFile(`${config.query} (${n})`, n);
+	  		writeJsonToFile(filename, i ? i + 1 : 1);
 	  	} else {
-			fs.writeFileSync(`downloads/${filename}.json`, JSON.stringify(images, null, 2), "utf-8");
+			fs.writeFileSync(`downloads/${filename}${suffix}.json`, JSON.stringify(images, null, 2), "utf-8");
 	  	}
 	});
 }
 
 
-crawl(config, (err, images) => {	// callback fires when last page got fetched
+crawl(config, (err, options, images) => {	// callback fires when last page got fetched
 	if (err) console.log(err);
 
 	if (images) {
 		console.log(`${images.length} images fetched.\n`);
 
 		// decide what actions to take
-    	if (config.param === "-l") {
+    	if (options.param === "-l") {
     		console.log(images);
     	}
 	
-    	if (config.param === "-j" || config.param === "-d") {
-			writeJsonToFile(config.query);
+    	if (options.param === "-j" || options.param === "-d") {
+			writeJsonToFile(options.query);
 		}
 	
-    	if (config.param === "-d") {
-    	    downloadHandler(config.query, images);
+    	if (options.param === "-d") {
+    	    downloadHandler(options.query, images);
     	}
 
   	} else {
