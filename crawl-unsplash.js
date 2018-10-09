@@ -17,17 +17,19 @@ function crawl(options, done) {
   	if (!options) {
   	  	return (done(new Error("Options are not defined.")))
   	}
+
 	// validate parameter
 	if (options.param !== "-d" && options.param !== "-j" && options.param !== "-l") {
     	return (done(new Error("Invalid parameter.")))
-	} 
+	}
+
 	// validate query string
-	if (config.query / 1 > 0 || config.query === undefined || config.query.substring(0, 1) === "-") {
+	if (options.query / 1 > 0 || options.query === undefined || options.query.substring(0, 1) === "-") {
     	return (done(new Error("Invalid query." )))
 	}
 
 	let pages = [];
-	for (let i = config.startPage; i <= config.endPage; i++) {
+	for (let i = options.startPage; i <= options.endPage; i++) {
 		pages.push(i);
 	}
 
