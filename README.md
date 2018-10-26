@@ -15,7 +15,7 @@ From the directory of the repository run:
 ### Parameter
 - `-j`: Download a JSON file containing data and links to images.
 - `-d`: Download a JSON file and all images.
-- `-l`: Print the data to console without downloading an files.
+- `-l`: Print JSON to console without downloading any files.
 
 *Parameter is required.*
 
