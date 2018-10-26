@@ -21,6 +21,7 @@ From the directory of the repository run:
 
 ### Query
 The query is a string and determines the theme / kind of images you will get.
+
 *Query has to be a string and is required.* 
 
 ### Pages
