@@ -111,15 +111,20 @@ crawl(config, (err, options, images) => {	// callback fires when last page got f
     		console.log(images);
     	}
 	
-    	if (options.param === "-j" || options.param === "-d") {
+    	if (options.param === "-j" || options.param === "-d") {	// options.param.substring(0,1) === "-d"
 			writeJsonToFile(options.query);
 		}
 	
-    	if (options.param === "-d") {
-    	    downloadHandler(options.query, images);
+    	if (options.param === "-d" || options.param === "-dL") {// options.param.substring(0,1) === "-d"
+    	    downloadHandler(options.query, images, undefined, "raw");
     	}
-
   	} else {
 		console.log("Nothing returned.");
 	}
 });
+
+const size = (param) {
+	if (param === "-dL") return "raw"
+	if (param === "-dM") return "regular"
+	if (param === "-dS") return "small"
+}
