@@ -15,17 +15,18 @@ let images = [];
 
 function crawl(options, done) {
   	if (!options) {
-  	  	return (done(new Error("Options are not defined.")))
+  	  	return done(new Error("Options are not defined.\n"));
   	}
 
 	// validate parameter
-	if (options.param !== "-d" && options.param !== "-j" && options.param !== "-l") {
-    	return (done(new Error("Invalid parameter.")))
+	const validParams = ["-d", "-j", "-l"];
+	if (validParams.indexOf(options.param) < 0) {
+    	return done(new Error("Invalid parameter.\n"));
 	}
 
 	// validate query string
 	if (options.query / 1 > 0 || options.query === undefined || options.query.substring(0, 1) === "-") {
-    	return (done(new Error("Invalid query." )))
+    	return done(new Error("Invalid query.\n" ));
 	}
 
 	let pages = [];
@@ -80,7 +81,7 @@ function downloadHandler(filename, images, i) {
 	
 	    	// log out total dl size once all dls are initiated
 	    	if (total.length === images.length) {
-	    		console.log(`${Math.round(total.reduce((prev, curr) => prev + curr, 0) / 1000000)} MB total.\ndownloading now...\n`)
+	    		console.log(`${(total.reduce((prev, curr) => prev + curr, 0) / 1000000).toFixed(2)} MB total.\ndownloading now...\n`)
 	    	}
 	  	});
 	}
