@@ -19,7 +19,7 @@ function crawl(options, done) {
   	}
 
 	// validate parameter
-	const validParams = ["-d", "-j", "-l"];
+	const validParams = ["-d", "-dL", "-dM", "-dS", "-j", "-l"];
 	if (validParams.indexOf(options.param) < 0) {
     	return done(new Error("Invalid parameter.\n"));
 	}
@@ -56,28 +56,22 @@ function doPerPage(query, page, done) {
 	})
 }
 
-function downloadHandler(filename, images, i) {
-	// keeps track of total dl size and completed dls. (Maybe limit nr of concurrent dls in future version) 
+function downloadHandler(path, images, imgQuality) {
+	// keeps track of total dl size and completed dls.
+	// Maybe limit number of concurrent downloads in future version 
 	let total = [];
 	let counter = 0;
 
-	// recursively ensures unique filename
-	const suffix = i ? ` (${i})` : "";	// eg. (1)
-	fs.mkdir(`downloads/${filename}${suffix}`, (err) => {
-		if (err) {
-			downloadHandler(filename, images, i ? i + 1 : 1);
-		} else {
-    		images.map((img, i) => download(img.urls.raw, `downloads/${filename}${suffix}/${i}.jpg`, () => {
-    			counter++;
-    			console.log(`${counter}/${images.length} done.`);
-    		}));
-		}
-	})
+    images.map((img, i) => download(img.urls[imgQuality], `${path}/${i}.jpg`, () => {
+    	counter++;
+    	console.log(`${counter}/${images.length} done.`);
+    }));
 
-	function download(uri, filename, done) {
+	function download(uri, path, done) {
 	  	request.head(uri, (err, res, body) => {
-	  		total.push(Number(res.headers['content-length']));
-	    	request(uri).pipe(fs.createWriteStream(filename)).on('close', done);
+	  		if (err) { console.error("DL REQUEST ERR: ", err);return; }	// temporary error handler
+	  		total.push(Number(res.headers['content-length']) || 0);
+	    	request(uri).pipe(fs.createWriteStream(path)).on('close', done);
 	
 	    	// log out total dl size once all dls are initiated
 	    	if (total.length === images.length) {
@@ -87,44 +81,48 @@ function downloadHandler(filename, images, i) {
 	}
 }
 
-function writeJsonToFile(filename, i) {
-	// recursively ensures unique filename
-	const suffix = i ? ` (${i})` : "";	// eg. (1)
-	fs.exists(`downloads/${filename}${suffix}.json`, (exists) => {
-	  	if (exists) {
-	  		writeJsonToFile(filename, i ? i + 1 : 1);
-	  	} else {
-			fs.writeFileSync(`downloads/${filename}${suffix}.json`, JSON.stringify(images, null, 2), "utf-8");
-	  	}
-	});
+function writeJsonToFile(path, i) {
+	fs.writeFileSync(`${path}/list.json`, JSON.stringify(images, null, 2), "utf-8");
 }
-
 
 crawl(config, (err, options, images) => {	// callback fires when last page got fetched
 	if (err) console.log(err);
 
 	if (images) {
+		const { param, query } = options;
 		console.log(`${images.length} images fetched.\n`);
 
 		// decide what actions to take
-    	if (options.param === "-l") {
+    	if (param === "-l") {
     		console.log(images);
-    	}
-	
-    	if (options.param === "-j" || options.param === "-d") {	// options.param.substring(0,1) === "-d"
-			writeJsonToFile(options.query);
+    	} else {
+    		makeUniqueDirectory(`downloads/${query}`, (uniquePath) => {
+				writeJsonToFile(uniquePath);
+		
+    			if (param.substring(0, 2) === "-d") {
+    			    downloadHandler(uniquePath, images, parseDownloadParameter(param));
+    			}
+    		});
 		}
-	
-    	if (options.param === "-d" || options.param === "-dL") {// options.param.substring(0,1) === "-d"
-    	    downloadHandler(options.query, images, undefined, "raw");
-    	}
   	} else {
 		console.log("Nothing returned.");
 	}
 });
 
-const size = (param) {
-	if (param === "-dL") return "raw"
-	if (param === "-dM") return "regular"
-	if (param === "-dS") return "small"
+function parseDownloadParameter(param) {
+	if (param === "-dL" || param === "-d") return "full";
+	if (param === "-dM") return "regular";
+	if (param === "-dS") return "small";
+}
+
+function makeUniqueDirectory(path, done, i) {
+	// recursively ensures unique path
+	const suffix = i ? ` (${i})` : "";	// eg. (1)
+	fs.mkdir(`${path}${suffix}`, (err) => {
+	  	if (err) {
+	  		makeUniqueDirectory(path, done, i ? i + 1 : 1);
+	  	} else {
+	  		done(`${path}${suffix}`);
+	  	}
+	});
 }

@@ -13,22 +13,33 @@ From the directory of the repository run:
 `node crawl-unsplash <parameter> <query> <pages>`
 
 ### Parameter
+*Parameter is required.*
+
 - `-j`: Download a JSON file containing data and links to images.
 - `-d`: Download a JSON file and all images.
 - `-l`: Print JSON to console without downloading any files.
 
-*Parameter is required.*
+You may use variations of the download parameter `-d` to further specify the image size. 
+You can choose between 
+- `-dL` for the raw image (~ 4k), 
+- `-dM` for a mediumsized image (~ 1080x720),
+- `-dS` for a small image (~ 400x300).
+
+**Note:** Downloading multiple pages of large images can become a multiple gigabyte download very quickly. 
+Depending on your bandwidth, connection or PC you might not be able to handle this and you might get a TIMEOUT error. 
+If that's the case consider downloading less pages simultaneously.
+
 
 ### Query
-The query is a string and determines the theme / kind of images you will get.
-
 *Query has to be a string and is required.* 
 
+The query is a string and determines the theme / kind of images you will get.
+
 ### Pages
+*Pages are optional and if omitted default to 1.*
+
 Define the amount of pages to be fetched. One page is 30 images.
 You may split the pages arg into 2 seperate args to define a start and end page. The end page will be included. To fetch one specific page eg. page 2 use `2 2`.
-
-*Pages are optional and if omitted default to 1.*
 
 ## Examples
 `node crawl-unsplash -d wanderlust` fetches the first page and downloads all images and the JSON file.
