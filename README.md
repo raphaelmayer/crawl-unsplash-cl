@@ -1,4 +1,4 @@
-# Crawl-Unsplash-CL
+# Crawl-Unsplash-CLI
 A simple node.js command line tool to scrape and download royalty free HD images from https://unsplash.com.
 If you happen to find a bug or want to suggest a feature, feel free to contact me or *contribute*.
 
@@ -25,9 +25,7 @@ You can choose between
 - `-dM` for a mediumsized image (~ 1080x720),
 - `-dS` for a small image (~ 400x300).
 
-**Note:** Downloading multiple pages of large images can become a multiple gigabyte download very quickly. 
-Depending on your bandwidth, connection or PC you might not be able to handle this and you might get a TIMEOUT error. 
-If that's the case consider downloading less pages simultaneously.
+**Note:** Downloading a lot of large images will become a huge download very quickly.
 
 
 ### Query
@@ -39,7 +37,7 @@ The query is a string and determines the theme / kind of images you will get.
 *Pages are optional and if omitted default to 1.*
 
 Define the amount of pages to be fetched. One page is 30 images.
-You may split the pages arg into 2 seperate args to define a start and end page. The end page will be included. To fetch one specific page eg. page 2 use `2 2`.
+You may split the pages argument into 2 seperate arguments to define a start and end page. The end page will be included. To fetch one specific page eg. page 2 use `2 2`.
 
 ## Examples
 `node crawl-unsplash -d wanderlust` fetches the first page and downloads all images and the JSON file.
@@ -51,7 +49,7 @@ You may split the pages arg into 2 seperate args to define a start and end page.
 
 Images and JSON lists are in order, although when fetching additional pages at a later point without clearing the downloads directory will most likely result in inconsistent results, since those pages update content so frequently and page 1 today might be page 10 tomorrow. 
 
-Concurrent downloads are currently not limited, although it might make sense to implement this in some form. 
+Concurrent downloads are currently limited to 20 at one time, although it might make sense to implement a limit by user input at some point. 
 
 ## Contributions
 Contributions are welcome. Concisely state the problem and how you solved it. Do not fix multiple things in one PR. If you happen to find something else to fix while fixing any part of the code, please open another PR if you want to address this issue aswell. 

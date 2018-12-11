@@ -1,6 +1,7 @@
 const request = require("request");
 const async = require("async");
 const fs = require("fs");
+const h = require("./helpers");
 
 const config = {
   	param: process.argv[2],
@@ -56,33 +57,35 @@ function doPerPage(query, page, done) {
 	})
 }
 
-function downloadHandler(path, images, imgQuality) {
+function downloadHandler(images, dir, imgQuality) {
+	console.log(`total file size will be around ${h.estimateFilesize(imgQuality, images.length)} MB.\ndownloading now...\n`);
 	// keeps track of total dl size and completed dls.
-	// Maybe limit number of concurrent downloads in future version 
 	let total = [];
 	let counter = 0;
 
-    images.map((img, i) => download(img.urls[imgQuality], `${path}/${i}.jpg`, () => {
-    	counter++;
-    	console.log(`${counter}/${images.length} done.`);
-    }));
+	async.eachOfLimit(images, 20, (img, i, done) => {
+		download(img.urls[imgQuality], `${dir}/${i}.jpg`, done);	
+	}, (err) => {
+    	if (err) console.error(err);
+    	console.log(`\ndone.\ndownloaded ${total.length} images (${h.reduceToMegabyte(total)} MB)`);
+	});
 
-	function download(uri, path, done) {
-	  	request.head(uri, (err, res, body) => {
-	  		if (err) { console.error("DL REQUEST ERR: ", err);return; }	// temporary error handler
+	function download(uri, dir, done) {
+	  	request.head(uri, (err, res) => {
+	  		if (err) console.error("DL REQUEST ERR: ", err);
+
 	  		total.push(Number(res.headers['content-length']) || 0);
-	    	request(uri).pipe(fs.createWriteStream(path)).on('close', done);
-	
-	    	// log out total dl size once all dls are initiated
-	    	if (total.length === images.length) {
-	    		console.log(`${(total.reduce((prev, curr) => prev + curr, 0) / 1000000).toFixed(2)} MB total.\ndownloading now...\n`)
-	    	}
+	    	request(uri).pipe(fs.createWriteStream(dir)).on('close', (err) => {
+	    		counter++;
+	    		console.log(`${counter} / ${images.length}`);
+	    		done(err);
+	    	});
 	  	});
 	}
 }
 
-function writeJsonToFile(path, i) {
-	fs.writeFileSync(`${path}/list.json`, JSON.stringify(images, null, 2), "utf-8");
+function writeJsonToFile(dir, i) {
+	fs.writeFileSync(`${dir}/list.json`, JSON.stringify(images, null, 2), "utf-8");
 }
 
 crawl(config, (err, options, images) => {	// callback fires when last page got fetched
@@ -96,11 +99,11 @@ crawl(config, (err, options, images) => {	// callback fires when last page got f
     	if (param === "-l") {
     		console.log(images);
     	} else {
-    		makeUniqueDirectory(`downloads/${query}`, (uniquePath) => {
-				writeJsonToFile(uniquePath);
+    		h.makeUniqueDirectory(`downloads/${query}`, (dir) => {
+				writeJsonToFile(dir);
 		
     			if (param.substring(0, 2) === "-d") {
-    			    downloadHandler(uniquePath, images, parseDownloadParameter(param));
+    			    downloadHandler(images, dir, h.parseDownloadParameter(param));
     			}
     		});
 		}
@@ -108,21 +111,3 @@ crawl(config, (err, options, images) => {	// callback fires when last page got f
 		console.log("Nothing returned.");
 	}
 });
-
-function parseDownloadParameter(param) {
-	if (param === "-dL" || param === "-d") return "full";
-	if (param === "-dM") return "regular";
-	if (param === "-dS") return "small";
-}
-
-function makeUniqueDirectory(path, done, i) {
-	// recursively ensures unique path
-	const suffix = i ? ` (${i})` : "";	// eg. (1)
-	fs.mkdir(`${path}${suffix}`, (err) => {
-	  	if (err) {
-	  		makeUniqueDirectory(path, done, i ? i + 1 : 1);
-	  	} else {
-	  		done(`${path}${suffix}`);
-	  	}
-	});
-}
