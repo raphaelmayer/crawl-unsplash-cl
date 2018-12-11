@@ -85,7 +85,7 @@ function downloadHandler(images, dir, imgQuality) {
 	}
 }
 
-function writeJsonToFile(dir, i) {
+function writeJsonToFile(dir) {
 	fs.writeFileSync(`${dir}/list.json`, JSON.stringify(images, null, 2), "utf-8");
 }
 
