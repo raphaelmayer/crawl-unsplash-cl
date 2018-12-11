@@ -58,12 +58,13 @@ function doPerPage(query, page, done) {
 }
 
 function downloadHandler(images, dir, imgQuality) {
-	console.log(`total file size will be around ${h.estimateFilesize(imgQuality, images.length)} MB.\ndownloading now...\n`);
 	// keeps track of total dl size and completed dls.
 	let total = [];
 	let counter = 0;
+	const limit = 20;
+	console.log(`total file size will be around ${h.estimateFilesize(imgQuality, images.length)} MB.\ndownloading now...\n`);
 
-	async.eachOfLimit(images, 20, (img, i, done) => {
+	async.eachOfLimit(images, limit, (img, i, done) => {
 		download(img.urls[imgQuality], `${dir}/${i}.jpg`, done);	
 	}, (err) => {
     	if (err) console.error(err);
