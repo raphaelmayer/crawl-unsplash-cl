@@ -1,7 +1,7 @@
 const request = require("request");
 const async = require("async");
 const fs = require("fs");
-const h = require("./helpers");
+const h = require("./utils");
 
 const config = {
   	param: process.argv[2],
@@ -31,6 +31,7 @@ function crawl(options, done) {
 	}
 
 	let pages = [];
+
 	for (let i = options.startPage; i <= options.endPage; i++) {
 		pages.push(i);
 	}
@@ -42,6 +43,7 @@ function crawl(options, done) {
 
 function doPerPage(query, page, done) {
 	const url = `https://unsplash.com/napi/search/photos?query=${query}&per_page=30&page=${page}`;
+	
 	request(url, (err, res, body) => {
 		if (err) done(err);
 
@@ -50,7 +52,7 @@ function doPerPage(query, page, done) {
 			page === 1 && console.log(`${json.total} total results.\n${json.total_pages} total pages.`);
 
 			json.results.map(img => images.push(img));
-			done();
+			done(null);
 		} else {
 			done(new Error(`Could not request unsplash. (${res && res.statusCode})`));
 		}
@@ -68,7 +70,7 @@ function downloadHandler(images, dir, imgQuality) {
 		download(img.urls[imgQuality], `${dir}/${i}.jpg`, done);	
 	}, (err) => {
     	if (err) console.error(err);
-    	console.log(`\ndone.\ndownloaded ${total.length} images (${h.reduceToMegabyte(total)} MB)`);
+    	console.log(`\n\ndone.\ndownloaded ${total.length} images. (${h.reduceToMegabyte(total)} MB)`);
 	});
 
 	function download(uri, dir, done) {
@@ -76,9 +78,10 @@ function downloadHandler(images, dir, imgQuality) {
 	  		if (err) console.error("DL REQUEST ERR: ", err);
 
 	  		total.push(Number(res.headers['content-length']) || 0);
+	    	
 	    	request(uri).pipe(fs.createWriteStream(dir)).on('close', (err) => {
 	    		counter++;
-	    		console.log(`${counter} / ${images.length}`);
+	    		process.stdout.write(`\r${counter} / ${images.length}`);
 	    		done(err);
 	    	});
 	  	});

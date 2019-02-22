@@ -10,7 +10,7 @@ If you happen to find a bug or want to suggest a feature, feel free to contact m
 
 ## Usage
 From the directory of the repository run:
-`node crawl-unsplash <parameter> <query> <pages>`
+`node crawl <parameter> <query> <pages>`
 
 ### Parameter
 *Parameter is required.*
@@ -40,11 +40,11 @@ Define the amount of pages to be fetched. One page is 30 images.
 You may split the pages argument into 2 seperate arguments to define a start and end page. The end page will be included. To fetch one specific page eg. page 2 use `2 2`.
 
 ## Examples
-`node crawl-unsplash -d wanderlust` fetches the first page and downloads all images and the JSON file.
+`node crawl -d wanderlust` fetches the first page and downloads all images and the JSON file.
 
-`node crawl-unsplash -l wanderlust 10` fetches pages 1 to 10 and logs JSON to console.
+`node crawl -l wanderlust 10` fetches pages 1 to 10 and logs JSON to console.
 
-`node crawl-unsplash -j wanderlust 10 20` fetches pages 10 to 20 and downloads the JSON file.
+`node crawl -j wanderlust 10 20` fetches pages 10 to 20 and downloads the JSON file.
 
 
 Images and JSON lists are in order, although when fetching additional pages at a later point without clearing the downloads directory will most likely result in inconsistent results, since those pages update content so frequently and page 1 today might be page 10 tomorrow. 
