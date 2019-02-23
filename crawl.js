@@ -93,7 +93,8 @@ function writeJsonToFile(dir) {
 }
 
 crawl(config, (err, options, images) => {	// callback fires when last page got fetched
-	if (err) console.log(err);
+	// err.message to hide stack trace
+	if (err) return console.log(err.message);
 
 	if (images) {
 		const { param, query } = options;
