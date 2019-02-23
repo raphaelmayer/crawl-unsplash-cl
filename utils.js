@@ -13,9 +13,10 @@ function parseDownloadParameter(param) {
 	if (param === "-dS") return "small";
 }
 
+// recursively ensures unique path
 function makeUniqueDirectory(path, done, i) {
-	// recursively ensures unique path
 	const suffix = i ? ` (${i})` : "";	// eg. (1)
+
 	fs.mkdir(`${path}${suffix}`, (err) => {
 	  	if (err) {
 	  		makeUniqueDirectory(path, done, i ? i + 1 : 1);
@@ -25,6 +26,8 @@ function makeUniqueDirectory(path, done, i) {
 	});
 }
 
+// use average filesizes to estimate
+// because we don't know when initiating download
 function estimateFilesize(imgQuality, imgCount) {
 	if (imgQuality === "full") return 3.5 * imgCount;		// 301 / 90
 	if (imgQuality === "regular") return 0.2 * imgCount;	// 17.3 / 90
