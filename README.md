@@ -15,9 +15,11 @@ From the directory of the repository run:
 ### Parameter
 *Parameter is required.*
 
-- `-j`: Download a JSON file containing data and links to images.
-- `-d`: Download a JSON file and all images.
-- `-l`: Print JSON to console without downloading any files.
+The parameter determines what to do with the fetched data. 
+
+- `-l`: Print fetched data to console without downloading any files.
+- `-j`: Dump image data into a JSON file without downloading any images.
+- `-d`: Dump image data into a JSON file and download all images.
 
 You may use variations of the download parameter `-d` to further specify the image size. 
 You can choose between 
@@ -36,20 +38,18 @@ The query is a string and determines the theme / kind of images you will get.
 ### Pages
 *Pages are optional and if omitted default to 1.*
 
-Define the amount of pages to be fetched. One page is 30 images.
+Define the number of pages to be fetched. One page amounts to 30 images.
 You may split the pages argument into 2 seperate arguments to define a start and end page. The end page will be included. To fetch one specific page eg. page 2 use `2 2`.
 
 ## Examples
-`node crawl -d wanderlust` fetches the first page and downloads all images and the JSON file.
+`node crawl -d wanderlust` fetches the first page and downloads all images and creates a JSON file.
 
 `node crawl -l wanderlust 10` fetches pages 1 to 10 and logs JSON to console.
 
-`node crawl -j wanderlust 10 20` fetches pages 10 to 20 and downloads the JSON file.
+`node crawl -j wanderlust 10 20` fetches pages 10 to 20 and creates a JSON file.
 
-
-Images and JSON lists are in order, although when fetching additional pages at a later point without clearing the downloads directory will most likely result in inconsistent results, since those pages update content so frequently and page 1 today might be page 10 tomorrow. 
-
+## Additional notes
 Concurrent downloads are currently limited to 20 at one time, although it might make sense to implement a limit by user input at some point. 
 
 ## Contributions
-Contributions are welcome. Concisely state the problem and how you solved it. Do not fix multiple things in one PR. If you happen to find something else to fix while fixing any part of the code, please open another PR if you want to address this issue aswell. 
+If you want to contribute or have suggestions feel free to open a PR, raise an issue or get in touch. 
