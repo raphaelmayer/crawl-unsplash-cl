@@ -82,6 +82,7 @@ function downloadHandler(images, dir, imgQuality) {
 	    	request(uri).pipe(fs.createWriteStream(dir)).on('close', (err) => {
 	    		counter++;
 	    		process.stdout.write(`\r${counter} / ${images.length}`);
+	    		
 	    		done(err);
 	    	});
 	  	});
