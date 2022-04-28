@@ -4,7 +4,7 @@
   "description": "Command Line Tool to scrape images from unsplash.",
   "main": "crawl-unsplash.js",
   "dependencies": {
-    "async": "^2.6.1",
+    "async": "^2.6.4",
     "request": "^2.88.0"
   },
   "devDependencies": {},
